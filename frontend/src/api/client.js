@@ -1,10 +1,13 @@
-import axios from 'axios'
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
 
 const api = axios.create({
-  baseURL: '/api',
-  headers: { 'Content-Type': 'application/json' },
-})
+  baseURL: API_URL,
+  headers: { "Content-Type": "application/json" },
+});
 
+export default api;
 // Attach token to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token')
@@ -26,7 +29,7 @@ api.interceptors.response.use(
 
       if (refresh) {
         try {
-          const { data } = await axios.post('/api/auth/refresh/', { refresh })
+          const { data } = await api.post('/auth/refresh/', { refresh })
           localStorage.setItem('access_token', data.access)
           original.headers.Authorization = `Bearer ${data.access}`
           return api(original)
@@ -84,4 +87,4 @@ export const chatApi = {
   edit: (messageId, text) => api.patch(`/messages/${messageId}/`, { text }),
 }
 
-export default api
+
